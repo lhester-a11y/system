@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/Bat.gd" id="1_bat"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bat.png" id="2_bat_art"]
+[ext_resource type="Texture2D" path="res://assets/sprites/crown.png" id="3_crown_art"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bat"]
+size = Vector2(38, 24)
+
+[node name="Bat" type="Area2D"]
+script = ExtResource("1_bat")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_bat_art")
+scale = Vector2(0.375, 0.375)
+
+[node name="Crown" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(0, -46)
+scale = Vector2(0.375, 0.375)
+texture = ExtResource("3_crown_art")
+
+[node name="Shape" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_bat")

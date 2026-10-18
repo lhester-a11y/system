@@ -1,0 +1,33 @@
+; CodePlay - Godot 4 project.
+; Open this folder (godot/) with Godot 4.2 or newer and press F5.
+
+config_version=5
+
+[application]
+
+config/name="CodePlay"
+config/description="Throw the spear, absorb the code box, answer the checkpoint."
+run/main_scene="res://scenes/Main.tscn"
+config/features=PackedStringArray("4.2", "GL Compatibility")
+
+[autoload]
+
+Rules="*res://scripts/Rules.gd"
+Save="*res://scripts/Save.gd"
+QuestionBank="*res://scripts/QuestionBank.gd"
+UpgradeSystem="*res://scripts/UpgradeSystem.gd"
+Sfx="*res://scripts/Sfx.gd"
+
+[display]
+
+window/size/viewport_width=360
+window/size/viewport_height=640
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+window/handheld/orientation=1
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.02, 0.03, 0.06, 1)

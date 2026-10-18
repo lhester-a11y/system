@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/Bug.gd" id="1_bug"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bug.png" id="2_bug_art"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bug"]
+size = Vector2(12, 12)
+
+[node name="Bug" type="Area2D"]
+script = ExtResource("1_bug")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_bug_art")
+scale = Vector2(0.375, 0.375)
+
+[node name="Shape" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_bug")

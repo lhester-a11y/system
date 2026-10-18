@@ -1,0 +1,6 @@
+{
+  "name": "codeplay",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-12",
+  "assets": { "directory": "./public", "binding": "ASSETS" }
+}

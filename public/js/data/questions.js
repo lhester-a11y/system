@@ -1,0 +1,458 @@
+/**
+ * CodePlay question bank.
+ *
+ * Every checkpoint question is plain data so it can be validated by tests and
+ * swapped for a real backend later. Schema:
+ *
+ *   id         unique string
+ *   lang       one of LANGUAGE_IDS (html | css | js | python | java | cpp)
+ *   difficulty 1 = recall, 2 = comprehension, 3 = applied logic
+ *   kind       'mc' (multiple choice) | 'tf' (true/false) | 'fill' (complete the code)
+ *   prompt     the question text; a 'fill' prompt contains the marker __BLANK__
+ *   code       optional code snippet shown above the answers
+ *   choices    answer options, always at least 2
+ *   answer     index into `choices` of the single correct option
+ *   explain    beginner-friendly "why" shown after answering
+ *   topic      short tag used by the progress tracker
+ *   reward     upgrade family this question tends to grant
+ */
+
+export const LANGUAGES = [
+  { id: 'html',   name: 'HTML',       label: 'HTML',   color: '#ef6a5a', module: 1, sky: 'day',    blurb: 'Structure of the web' },
+  { id: 'css',    name: 'CSS',        label: 'CSS',    color: '#6bb8ff', module: 2, sky: 'day',    blurb: 'Styling and layout' },
+  { id: 'js',     name: 'JavaScript', label: 'JS',     color: '#f2c14e', module: 3, sky: 'sunset', blurb: 'Behaviour in the browser' },
+  { id: 'python', name: 'Python',     label: 'Python', color: '#5fe08a', module: 4, sky: 'sunset', blurb: 'Readable general-purpose code' },
+  { id: 'java',   name: 'Java',       label: 'Java',   color: '#b98bff', module: 5, sky: 'night',  blurb: 'Strict, typed, everywhere' },
+  { id: 'cpp',    name: 'C++',        label: 'C++',    color: '#7ee3e3', module: 6, sky: 'night',  blurb: 'Close to the metal' },
+];
+
+export const LANGUAGE_IDS = LANGUAGES.map((l) => l.id);
+
+export const QUESTIONS = [
+  /* ------------------------------- HTML ------------------------------- */
+  {
+    id: 'html-01', lang: 'html', difficulty: 1, kind: 'tf',
+    prompt: 'HTML stands for HyperText Markup Language.',
+    choices: ['True', 'False'], answer: 0,
+    explain: 'Yes - HTML is a markup language. It describes the structure and meaning of content with tags; it does not compute anything.',
+    topic: 'Basics', reward: 'shield',
+  },
+  {
+    id: 'html-02', lang: 'html', difficulty: 1, kind: 'mc',
+    prompt: 'Which tag creates the largest heading on a page?',
+    code: '<h1>Sleeping Beauty</h1>',
+    choices: ['<h1>', '<h6>', '<head>', '<heading>'],
+    answer: 0,
+    explain: '<h1> is the biggest heading and should be used once per page. Headings count DOWN: <h2>, <h3> ... <h6> is the smallest.',
+    topic: 'Text', reward: 'damage',
+  },
+  {
+    id: 'html-03', lang: 'html', difficulty: 1, kind: 'mc',
+    prompt: 'Which tag wraps a paragraph of text?',
+    choices: ['<p>', '<pg>', '<text>', '<par>'],
+    answer: 0,
+    explain: '<p> is the paragraph element. Everything between <p> and </p> is one block of text.',
+    topic: 'Text', reward: 'damage',
+  },
+  {
+    id: 'html-04', lang: 'html', difficulty: 2, kind: 'mc',
+    prompt: 'Which attribute gives an image a text alternative for screen readers?',
+    code: '<img src="bata.png" alt="A wooden spear">',
+    choices: ['alt', 'title', 'src', 'label'],
+    answer: 0,
+    explain: 'alt holds the alternative text. If the image cannot load, or a screen reader is used, alt is what the user receives.',
+    topic: 'Accessibility', reward: 'speed',
+  },
+  {
+    id: 'html-05', lang: 'html', difficulty: 2, kind: 'mc',
+    prompt: 'Which line creates a link the user can click?',
+    choices: ['<a href="page.html">Go</a>', '<link href="page.html">Go</link>', '<href>Go</href>', '<url>page.html</url>'],
+    answer: 0,
+    explain: 'The anchor tag <a> plus the href attribute makes a hyperlink. <link> is different - it attaches resources such as stylesheets and renders nothing.',
+    topic: 'Links', reward: 'multishot',
+  },
+  {
+    id: 'html-06', lang: 'html', difficulty: 2, kind: 'mc',
+    prompt: 'What does this markup look like in the browser?',
+    code: '<ul>\n  <li>Rice</li>\n  <li>Pinikpikan</li>\n</ul>',
+    choices: ['A bulleted list', 'A numbered list', 'A table', 'A single paragraph of text'],
+    answer: 0,
+    explain: '<ul> is an unordered list, so items get bullets. An ordered list uses <ol>, which numbers them 1, 2, 3.',
+    topic: 'Lists', reward: 'pierce',
+  },
+  {
+    id: 'html-07', lang: 'html', difficulty: 3, kind: 'mc',
+    prompt: 'Which of these is a void element - one that has no closing tag?',
+    choices: ['<img>', '<div>', '<span>', '<section>'],
+    answer: 0,
+    explain: '<img> is a void element: it never wraps content, so it needs no </img>. The other three all wrap content and must be closed.',
+    topic: 'Elements', reward: 'damage',
+  },
+  {
+    id: 'html-08', lang: 'html', difficulty: 3, kind: 'mc',
+    prompt: 'Where must the <title> element live?',
+    choices: ['Inside <head>', 'Inside <body>', 'Inside <html> but outside both', 'Anywhere on the page'],
+    answer: 0,
+    explain: '<head> holds metadata - the title, character set, stylesheets. Only what the user actually sees goes in <body>.',
+    topic: 'Document structure', reward: 'cooldown',
+  },
+
+  /* ------------------------------- CSS -------------------------------- */
+  {
+    id: 'css-01', lang: 'css', difficulty: 1, kind: 'tf',
+    prompt: 'CSS stands for Cascading Style Sheets.',
+    choices: ['True', 'False'], answer: 0,
+    explain: 'Correct. "Cascading" means several rules can target the same element, and the browser resolves which one wins by specificity and source order.',
+    topic: 'Basics', reward: 'shield',
+  },
+  {
+    id: 'css-02', lang: 'css', difficulty: 1, kind: 'mc',
+    prompt: 'Which property changes the colour of text?',
+    code: 'p { color: #5fe08a; }',
+    choices: ['color', 'text-color', 'font-color', 'foreground'],
+    answer: 0,
+    explain: 'The property is simply `color`. `background-color` paints the box behind the text - a very common mix-up for beginners.',
+    topic: 'Colour', reward: 'damage',
+  },
+  {
+    id: 'css-03', lang: 'css', difficulty: 1, kind: 'mc',
+    prompt: 'Which selector targets only elements with class="bata"?',
+    choices: ['.bata', '#bata', 'bata', '*bata'],
+    answer: 0,
+    explain: 'A dot selects a class. A hash selects an id, and a bare word selects a tag name such as <p>.',
+    topic: 'Selectors', reward: 'speed',
+  },
+  {
+    id: 'css-04', lang: 'css', difficulty: 2, kind: 'mc',
+    prompt: 'What does this rule change?',
+    code: 'h2 { font-size: 24px; }',
+    choices: ['The size of the text inside every <h2>', 'The width of every <h2> box', 'The spacing around the <h2>', 'The thickness of the heading border'],
+    answer: 0,
+    explain: 'font-size sets how tall the glyphs are. Box width is `width`, and spacing is `margin` or `padding`.',
+    topic: 'Typography', reward: 'damage',
+  },
+  {
+    id: 'css-05', lang: 'css', difficulty: 2, kind: 'mc',
+    prompt: 'Which unit is relative to the root font size, so it scales with the user settings?',
+    choices: ['rem', 'px', 'cm', 'pt'],
+    answer: 0,
+    explain: '1rem equals the root font size. rem scaling respects accessibility settings, while px is a fixed pixel and never scales.',
+    topic: 'Units', reward: 'speed',
+  },
+  {
+    id: 'css-06', lang: 'css', difficulty: 2, kind: 'mc',
+    prompt: 'Which property adds space INSIDE an element, between its content and its border?',
+    code: '.card { padding: 12px; border: 2px solid; }',
+    choices: ['padding', 'margin', 'outline', 'gap'],
+    answer: 0,
+    explain: 'Padding is inside the border. Margin is outside it, pushing other elements away. The box model reads: content -> padding -> border -> margin.',
+    topic: 'Box model', reward: 'shield',
+  },
+  {
+    id: 'css-07', lang: 'css', difficulty: 3, kind: 'mc',
+    prompt: 'Both rules target the same paragraph. Which declaration wins?',
+    code: '#hero { color: red; }\n.notice { color: blue; }',
+    choices: ['color: red - an id is more specific than a class', 'color: blue - classes are read after ids', 'Whichever was written first', 'Neither, the browser picks at random'],
+    answer: 0,
+    explain: 'Specificity: id (100) beats class (10) beats tag (1). Only when specificity is tied does the later rule win - here the id always wins.',
+    topic: 'Specificity', reward: 'damage',
+  },
+  {
+    id: 'css-08', lang: 'css', difficulty: 3, kind: 'mc',
+    prompt: 'Which value hides an element but still reserves its space in the layout?',
+    choices: ['visibility: hidden', 'display: none', 'opacity: 0', 'position: absolute'],
+    answer: 0,
+    explain: 'visibility: hidden keeps the box in place (invisible but still occupying its slot). display: none removes the box entirely, so the layout collapses.',
+    topic: 'Layout', reward: 'cooldown',
+  },
+
+  /* ---------------------------- JavaScript ---------------------------- */
+  {
+    id: 'js-01', lang: 'js', difficulty: 1, kind: 'mc',
+    prompt: 'Which keyword declares a variable that cannot be reassigned?',
+    code: 'const score = 0;',
+    choices: ['const', 'let', 'var', 'static'],
+    answer: 0,
+    explain: 'const creates a block-scoped binding that cannot be reassigned. let is the same but reassignable. Prefer const until the value truly must change.',
+    topic: 'Variables', reward: 'shield',
+  },
+  {
+    id: 'js-02', lang: 'js', difficulty: 1, kind: 'tf',
+    prompt: 'In JavaScript a single equals sign ( = ) compares two values for equality.',
+    choices: ['True', 'False'], answer: 1,
+    explain: 'False. A single = assigns a value. To compare, use === (strict, no type conversion) or == (loose, converts types first). Prefer ===.',
+    topic: 'Operators', reward: 'damage',
+  },
+  {
+    id: 'js-03', lang: 'js', difficulty: 1, kind: 'mc',
+    prompt: 'What does this line do?',
+    code: 'console.log("Kalinga");',
+    choices: ['Prints "Kalinga" to the developer console', 'Creates a variable named Kalinga', 'Shows "Kalinga" as a page heading', 'Sends "Kalinga" to a server'],
+    answer: 0,
+    explain: 'console.log() writes its argument to the browser console (F12, then Console). It is the beginner best friend for checking what a value really is.',
+    topic: 'Output', reward: 'cooldown',
+  },
+  {
+    id: 'js-04', lang: 'js', difficulty: 2, kind: 'mc',
+    prompt: 'What does this code print?',
+    code: 'let n = 5;\nn = n + 3;\nconsole.log(n);',
+    choices: ['8', '5', '3', '"53"'],
+    answer: 0,
+    explain: 'The right-hand side is evaluated first: n + 3 is 8, then the result is stored back into n. Printing n gives 8.',
+    topic: 'Assignment', reward: 'damage',
+  },
+  {
+    id: 'js-05', lang: 'js', difficulty: 2, kind: 'mc',
+    prompt: 'What is the value of typeof "7" ?',
+    choices: ['"string"', '"number"', '"integer"', '"boolean"'],
+    answer: 0,
+    explain: 'Quotes make it text, so typeof reports "string". Remember "7" (string) is not 7 (number) - a classic bug when reading form input.',
+    topic: 'Types', reward: 'speed',
+  },
+  {
+    id: 'js-06', lang: 'js', difficulty: 2, kind: 'mc',
+    prompt: 'What does this print?',
+    code: 'console.log("2" + 2);',
+    choices: ['"22"', '4', 'NaN', 'An error'],
+    answer: 0,
+    explain: 'With a string operand, + concatenates: JavaScript converts the number 2 to text and joins them, giving "22". Use Number("2") + 2 for arithmetic.',
+    topic: 'Types', reward: 'multishot',
+  },
+  {
+    id: 'js-07', lang: 'js', difficulty: 3, kind: 'mc',
+    prompt: 'What does this loop print, in order?',
+    code: 'for (let i = 0; i < 3; i++) {\n  console.log(i);\n}',
+    choices: ['0, 1, 2', '1, 2, 3', '0, 1, 2, 3', '3, 2, 1'],
+    answer: 0,
+    explain: 'i starts at 0 and runs while i < 3, so the body sees 0, 1, 2. The loop stops the moment i becomes 3, so 3 is never printed.',
+    topic: 'Loops', reward: 'pierce',
+  },
+  {
+    id: 'js-08', lang: 'js', difficulty: 3, kind: 'mc',
+    prompt: 'Which expression gives the number of items in the array?',
+    code: 'const bats = ["a", "b", "c"];',
+    choices: ['bats.length', 'bats.size()', 'count(bats)', 'bats.length()'],
+    answer: 0,
+    explain: 'Arrays expose `length` as a property (no parentheses). Functions use parentheses, properties do not - that difference trips up almost every beginner.',
+    topic: 'Arrays', reward: 'multishot',
+  },
+
+  /* ------------------------------ Python ------------------------------ */
+  {
+    id: 'python-01', lang: 'python', difficulty: 1, kind: 'mc',
+    prompt: 'Which keyword starts a function definition in Python?',
+    code: 'def greet(name):\n    print("Hello", name)',
+    choices: ['def', 'function', 'fun', 'void'],
+    answer: 0,
+    explain: 'Python uses `def`. Note the colon at the end of the line and the indented body - both are required.',
+    topic: 'Functions', reward: 'damage',
+  },
+  {
+    id: 'python-02', lang: 'python', difficulty: 1, kind: 'tf',
+    prompt: 'Python uses indentation to define code blocks instead of curly braces.',
+    choices: ['True', 'False'], answer: 0,
+    explain: 'True. In Python the whitespace IS the syntax. A block that is not indented consistently raises an IndentationError.',
+    topic: 'Syntax', reward: 'shield',
+  },
+  {
+    id: 'python-03', lang: 'python', difficulty: 1, kind: 'mc',
+    prompt: 'Which line prints the word Kalinga?',
+    choices: ['print("Kalinga")', 'echo "Kalinga"', 'console.log("Kalinga")', 'printf("Kalinga")'],
+    answer: 0,
+    explain: 'print() is the Python 3 output function. echo is shell/PHP, console.log is JavaScript, and printf is C.',
+    topic: 'Output', reward: 'cooldown',
+  },
+  {
+    id: 'python-04', lang: 'python', difficulty: 2, kind: 'mc',
+    prompt: 'What is the value of the expression 7 // 2 ?',
+    choices: ['3', '3.5', '4', '1'],
+    answer: 0,
+    explain: 'The // operator is floor division: it divides and rounds down to the whole number 3. A single / gives 3.5, and % gives the remainder 1.',
+    topic: 'Operators', reward: 'damage',
+  },
+  {
+    id: 'python-05', lang: 'python', difficulty: 2, kind: 'mc',
+    prompt: 'What does len([10, 20, 30]) return?',
+    choices: ['3', '30', '60', '2'],
+    answer: 0,
+    explain: 'len() counts the items in a sequence: three elements gives 3. It does not add them up.',
+    topic: 'Collections', reward: 'multishot',
+  },
+  {
+    id: 'python-06', lang: 'python', difficulty: 2, kind: 'mc',
+    prompt: 'Which of these creates a dictionary (key to value) rather than a list?',
+    choices: ['{"lang": "Python"}', '["Python", "Java"]', '("Python", "Java")', '{"Python", "Java"}'],
+    answer: 0,
+    explain: 'Curly braces with key: value pairs make a dict. Square brackets make a list, parentheses a tuple, and braces holding only values a set.',
+    topic: 'Collections', reward: 'pierce',
+  },
+  {
+    id: 'python-07', lang: 'python', difficulty: 3, kind: 'mc',
+    prompt: 'Which numbers does this loop print?',
+    code: 'for i in range(3):\n    print(i)',
+    choices: ['0, 1, 2', '1, 2, 3', '0, 1, 2, 3', '3'],
+    answer: 0,
+    explain: 'range(3) produces 0, 1, 2 - it stops BEFORE the stop value. range(1, 4) would give 1, 2, 3.',
+    topic: 'Loops', reward: 'pierce',
+  },
+  {
+    id: 'python-08', lang: 'python', difficulty: 3, kind: 'mc',
+    prompt: 'What is type(3.5) in Python?',
+    choices: ["<class 'float'>", "<class 'int'>", "<class 'str'>", "<class 'double'>"],
+    answer: 0,
+    explain: 'A number with a decimal point is a float in Python. int has no decimal point, and `double` is a C/Java name - Python only has float.',
+    topic: 'Types', reward: 'speed',
+  },
+
+  /* ------------------------------- Java ------------------------------- */
+  {
+    id: 'java-01', lang: 'java', difficulty: 1, kind: 'mc',
+    prompt: 'Which method signature is the entry point Java runs first?',
+    choices: [
+      'public static void main(String[] args)',
+      'public void start()',
+      'static main()',
+      'public static int main(String args)',
+    ],
+    answer: 0,
+    explain: 'Java looks for exactly `public static void main(String[] args)`. Change the name, the static modifier or the return type and the program will not start.',
+    topic: 'Structure', reward: 'shield',
+  },
+  {
+    id: 'java-02', lang: 'java', difficulty: 1, kind: 'tf',
+    prompt: 'Java is case-sensitive, so `String` and `string` are different names.',
+    choices: ['True', 'False'], answer: 0,
+    explain: 'True. `String` with a capital S compiles because it is a class; `string` does not exist. Java is strict about capitalisation everywhere.',
+    topic: 'Syntax', reward: 'damage',
+  },
+  {
+    id: 'java-03', lang: 'java', difficulty: 1, kind: 'mc',
+    prompt: 'Which keyword creates a new object from a class?',
+    code: 'Bat b = new Bat();',
+    choices: ['new', 'create', 'make', 'instance'],
+    answer: 0,
+    explain: '`new` allocates the object and calls a constructor. Java has no `create` or `make` keyword.',
+    topic: 'Objects', reward: 'multishot',
+  },
+  {
+    id: 'java-04', lang: 'java', difficulty: 2, kind: 'mc',
+    prompt: 'Which type stores a whole number such as 42?',
+    choices: ['int', 'String', 'boolean', 'char'],
+    answer: 0,
+    explain: 'int holds a 32-bit whole number. String is text, boolean is true/false, and char holds a single character in single quotes.',
+    topic: 'Types', reward: 'damage',
+  },
+  {
+    id: 'java-05', lang: 'java', difficulty: 2, kind: 'mc',
+    prompt: 'What does this line print?',
+    code: 'System.out.println("Hi");',
+    choices: ['Hi', 'The text "Hi" with quotes', 'Nothing, it stores the text', 'An error, quotes are not allowed'],
+    answer: 0,
+    explain: 'println prints the text and then moves to a new line. The quotes are delimiters and are not printed - the console shows just Hi.',
+    topic: 'Output', reward: 'cooldown',
+  },
+  {
+    id: 'java-06', lang: 'java', difficulty: 2, kind: 'mc',
+    prompt: 'Which keyword marks a variable as a constant that cannot change later?',
+    code: 'final int MAX_LIVES = 3;',
+    choices: ['final', 'const', 'static', 'locked'],
+    answer: 0,
+    explain: 'In Java the modifier is `final`. C++ and JavaScript use `const` instead - that is the mix-up to remember.',
+    topic: 'Variables', reward: 'shield',
+  },
+  {
+    id: 'java-07', lang: 'java', difficulty: 3, kind: 'mc',
+    prompt: 'What is stored in x?',
+    code: 'int x = 5 / 2;',
+    choices: ['2', '2.5', '3', 'A compile error'],
+    answer: 0,
+    explain: 'Both operands are int, so Java performs INTEGER division and throws the remainder away, giving 2. Write 5 / 2.0 if you need 2.5.',
+    topic: 'Operators', reward: 'damage',
+  },
+  {
+    id: 'java-08', lang: 'java', difficulty: 3, kind: 'mc',
+    prompt: 'Which line correctly declares a String variable?',
+    choices: ['String name = "Ana";', 'string name = "Ana";', "String name = 'Ana';", 'var String name = "Ana";'],
+    answer: 0,
+    explain: 'Capital S for the String class, then the name, then a double-quoted literal, then a semicolon. Single quotes are only for the char type.',
+    topic: 'Strings', reward: 'speed',
+  },
+
+  /* -------------------------------- C++ ------------------------------- */
+  {
+    id: 'cpp-01', lang: 'cpp', difficulty: 1, kind: 'mc',
+    prompt: 'Which header must be included to use std::cout?',
+    choices: ['#include <iostream>', '#include <console>', '#include <print.h>', '#include <stdio.h>'],
+    answer: 0,
+    explain: '<iostream> is the input/output stream header that defines std::cout and std::cin. <stdio.h> is the older C library (printf) and provides no cout.',
+    topic: 'Headers', reward: 'shield',
+  },
+  {
+    id: 'cpp-02', lang: 'cpp', difficulty: 1, kind: 'mc',
+    prompt: 'Which operator sends data INTO std::cout?',
+    code: 'std::cout << "Hello" << std::endl;',
+    choices: ['<<', '>>', '->', '::'],
+    answer: 0,
+    explain: 'The insertion operator << points INTO the output stream. >> points into a variable (used with cin). The arrow direction shows which way data flows.',
+    topic: 'Output', reward: 'damage',
+  },
+  {
+    id: 'cpp-03', lang: 'cpp', difficulty: 1, kind: 'tf',
+    prompt: 'C++ statements must end with a semicolon.',
+    choices: ['True', 'False'], answer: 0,
+    explain: 'True. A missing semicolon is the most common first compiler error, and the message usually points at the line AFTER the real mistake.',
+    topic: 'Syntax', reward: 'cooldown',
+  },
+  {
+    id: 'cpp-04', lang: 'cpp', difficulty: 2, kind: 'mc',
+    prompt: 'Which type stores a true/false value?',
+    choices: ['bool', 'bit', 'flag', 'boolean'],
+    answer: 0,
+    explain: 'The C++ type is `bool`, short for boolean. It is not spelled `boolean` - that spelling belongs to Java.',
+    topic: 'Types', reward: 'shield',
+  },
+  {
+    id: 'cpp-05', lang: 'cpp', difficulty: 2, kind: 'mc',
+    prompt: 'What is the value of a after these lines?',
+    code: 'int a = 10;\na++;',
+    choices: ['11', '10', '9', 'A compile error'],
+    answer: 0,
+    explain: 'The ++ operator increments by 1, so a becomes 11. (a-- would have made it 9.)',
+    topic: 'Operators', reward: 'damage',
+  },
+  {
+    id: 'cpp-06', lang: 'cpp', difficulty: 2, kind: 'mc',
+    prompt: 'Which function does a C++ program start executing from?',
+    choices: ['int main()', 'void start()', 'int run()', 'public static void main()'],
+    answer: 0,
+    explain: 'Execution always begins at main(). It returns an int to the operating system, where 0 means "finished successfully".',
+    topic: 'Structure', reward: 'multishot',
+  },
+  {
+    id: 'cpp-07', lang: 'cpp', difficulty: 3, kind: 'mc',
+    prompt: 'What does the std:: prefix in std::cout mean?',
+    choices: ['cout lives in the standard namespace', 'cout is a static variable', 'cout is standard library version 2', 'cout is a private member'],
+    answer: 0,
+    explain: 'std is the standard-library namespace and :: is the scope-resolution operator. `using namespace std;` lets you drop the prefix, at the cost of clearer code.',
+    topic: 'Namespaces', reward: 'speed',
+  },
+  {
+    id: 'cpp-08', lang: 'cpp', difficulty: 3, kind: 'mc',
+    prompt: 'What is stored in x?',
+    code: 'int x = 5 / 2;',
+    choices: ['2', '2.5', '2.0', 'A compile error'],
+    answer: 0,
+    explain: 'Both operands are int, so this is integer division and the result is 2. Write 5 / 2.0 or use a double to keep the fractional part.',
+    topic: 'Operators', reward: 'pierce',
+  },
+];
+
+/** All questions for one language, optionally capped by difficulty. */
+export function questionsFor(lang, maxDifficulty = 3) {
+  return QUESTIONS.filter((q) => q.lang === lang && q.difficulty <= maxDifficulty);
+}
+
+/** Look up a language record by id. */
+export function languageById(id) {
+  return LANGUAGES.find((l) => l.id === id) || null;
+}

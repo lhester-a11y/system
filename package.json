@@ -1,0 +1,28 @@
+{
+  "name": "codeplay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CodePlay - a mobile 2D pixel-art educational game teaching beginner IT students programming syntax and logic.",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 tools/serve.py",
+    "dev:static": "python3 -m http.server 3000 --bind 0.0.0.0",
+    "test": "node --test tests/core.test.mjs",
+    "sprites": "node tools/export-sprites.mjs",
+    "test:dom": "node tests/dom-smoke.mjs",
+    "assets": "node tools/export-sprites.mjs && node tools/export-questions-json.mjs",
+    "sfx": "node tools/make-sfx.mjs",
+    "build:standalone": "node tools/build-standalone.mjs",
+    "test:standalone": "node tests/standalone-smoke.mjs",
+    "test:all": "npm test && npm run test:dom && npm run test:standalone && npm run godot:test",
+    "godot:test": "node tools/godot-test.mjs",
+    "godot:export": "node tools/godot-export.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "jsdom": "^30.1.2"
+  }
+}

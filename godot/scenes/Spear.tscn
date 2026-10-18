@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/Spear.gd" id="1_spear"]
+[ext_resource type="Texture2D" path="res://assets/sprites/spear-bamboo.png" id="2_spear_art"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_spear"]
+size = Vector2(6, 34)
+
+[node name="Spear" type="Area2D"]
+script = ExtResource("1_spear")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_spear_art")
+scale = Vector2(0.375, 0.375)
+
+[node name="Shape" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_spear")
